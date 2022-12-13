@@ -4,7 +4,7 @@ from random import random
 from django.db import models
 
 
-def generate_name():
+def generate_name() -> str:
     name = "".join(random.choices(string.ascii_uppercase + string.digits, k=8))
     while Wallet.objects.filter(Wallet.objects.filter(name=name)):
         name = "".join(random.choices(string.ascii_uppercase + string.digits, k=8))
@@ -12,23 +12,27 @@ def generate_name():
 
 
 class Wallet(models.Model):
-    user = models.OneToOneField("User", related_name='account', on_delete=models.PROTECT, verbose_name="Владелец карты")
-    name = models.OneToOneField(max_length=9, default=generate_name, on_delete=models.PROTECT, verbose_name="Номер кошелька")
-    TYPE_OF_WALLET = [("Visa", "Visa"), ("Mastercard", "Mastercard")]
-    type = models.CharField(max_length=15, choices=TYPE_OF_WALLET, default="Visa", verbose_name="Тип кошелька")
-    CURRENCIES = [("USD", "US Dollar"), ("EUR", "Euro"), ("RUB", "Ruble")]
-    currency = models.CharField(max_length=4, choices=CURRENCIES, default="USD", verbose_name="Валюта")
-    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Баланс")
+    """Model wallet"""
+    TYPE = models.Choices("Visa", "Mastercard",)
+    CURRENCIES = ("USD", "EUR", "RUB",)
+
+    name = models.CharField(
+        max_length=8, blank=True, verbose_name="Номер кошелька")
+    type = models.CharField(
+        max_length=10, choices=CURRENCIES, verbose_name="Тип кошелька")
+    balance = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0, verbose_name="Баланс")
     created_on = models.DateTimeField(auto_now_add=True, verbose_name="Время создания")
     modified_on = models.DateTimeField(auto_now=True, verbose_name="Время изменения")
+    owner = models.ForeignKey("User", on_delete=models.CASCADE, related_name="wallets")
 
     def __str__(self):
         return self.name
 
 
 class Transaction(models.Model):
-    sender = models.ForeignKey(Wallet, verbose_name="Отправитель", on_delete=models.PROTECT, related_name='sender')
-    receiver = models.ForeignKey(Wallet, verbose_name="Получатель", on_delete=models.PROTECT, related_name='receiver')
+    sender = models.ForeignKey(Wallet, related_name='sender', on_delete=models.CASCADE, verbose_name="Отправитель")
+    receiver = models.ForeignKey(Wallet, related_name='receiver' , on_delete=models.CASCADE, verbose_name="Получатель")
     transfer_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Сумма")
     commission = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Комиссия")
     PAID_OR_FAILED = [("True", "PAID"), ("False", "FAILED")]
@@ -37,5 +41,8 @@ class Transaction(models.Model):
 
 
 class User(models.Model):
-    username = models.CharField(max_length=150, unique=True, error_messages=
+    username = models.CharField(max_length=150, unique=True, default=None, error_messages=
     {'unique': "A user with that username already exists."}, verbose_name="Владелец")
+
+    def __str__(self):
+        return self.username
