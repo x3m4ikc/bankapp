@@ -12,8 +12,8 @@ def generate_name():
 
 
 class Wallet(models.Model):
-    user = models.ForeignKey("User", on_delete=models.CASCADE, verbose_name="Владелец карты")
-    name = models.CharField(max_length=9, default=generate_name)
+    user = models.OneToOneField("User", related_name='account', on_delete=models.PROTECT, verbose_name="Владелец карты")
+    name = models.OneToOneField(max_length=9, default=generate_name, on_delete=models.PROTECT, verbose_name="Номер кошелька")
     TYPE_OF_WALLET = [("Visa", "Visa"), ("Mastercard", "Mastercard")]
     type = models.CharField(max_length=15, choices=TYPE_OF_WALLET, default="Visa", verbose_name="Тип кошелька")
     CURRENCIES = [("USD", "US Dollar"), ("EUR", "Euro"), ("RUB", "Ruble")]
@@ -31,10 +31,11 @@ class Transaction(models.Model):
     receiver = models.ForeignKey(Wallet, verbose_name="Получатель", on_delete=models.PROTECT, related_name='receiver')
     transfer_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Сумма")
     commission = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Комиссия")
-    PAID_OR_FAILED = [("True", "PAID"), ("False" ,"FAILED")]
+    PAID_OR_FAILED = [("True", "PAID"), ("False", "FAILED")]
     status = models.CharField(max_length=15, choices=PAID_OR_FAILED, default="FAILED", verbose_name="Тип кошелька")
     timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Время создания")
 
 
 class User(models.Model):
-    user = models.CharField(max_length=255, verbose_name="Владелец")
+    username = models.CharField(max_length=150, unique=True, error_messages=
+    {'unique': "A user with that username already exists."}, verbose_name="Владелец")
