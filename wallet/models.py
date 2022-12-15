@@ -3,8 +3,11 @@ from django.db import models
 
 class User(models.Model):
     """Model user"""
-    username = models.CharField(
-        max_length=50, blank=True, db_index=True)
+    username = models.CharField(max_length=50,
+                                blank=True,
+                                db_index=True,
+                                unique=True)
+    password = models.CharField(max_length=100)
 
     def __str__(self):
         return self.username
@@ -23,7 +26,7 @@ class Wallet(models.Model):
         ("RUB", "RUB"),
     )
 
-    name = models.CharField(max_length=8, blank=True)
+    name = models.CharField(max_length=8, blank=True, unique=True)
     type = models.CharField(max_length=10, choices=TYPE_CHOICES)
     currency = models.CharField(max_length=3, choices=CURRENCIES_CHOICES)
     balance = models.DecimalField(
