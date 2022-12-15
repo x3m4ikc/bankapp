@@ -124,3 +124,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ]
 }
+
+ROOT_URLCONF = 'bankapp.urls'
+AUTH_USER_MODEL = 'wallet.User'

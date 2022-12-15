@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from wallet.models import Wallet, User, Transaction
-from wallet.serializers import WalletSerializer, UserSerializer, TransactionSerializer, RegisterSerializer
+from wallet.serializers import WalletSerializer, UserSerializer, TransactionSerializer, UserRegisterSerializer
 
 
 class WalletViewSet(mixins.CreateModelMixin,
@@ -23,6 +23,11 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+
+class UserRegisterViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserRegisterSerializer
+
     @api_view(['POST'])
     def create_auth(self, request):
         serialized = UserSerializer(data=request.DATA)
@@ -36,7 +41,6 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(serialized.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class TransactionViewSet(mixins.CreateModelMixin,
