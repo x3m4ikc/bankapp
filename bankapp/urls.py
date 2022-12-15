@@ -14,6 +14,5 @@ router.register(r'wallets/transaction', TransactionViewSet, basename='transactio
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
-#    path('register/', RegisterAPI.as_view(), name='register'),
     path('drf-auth/', include('rest_framework.urls')),
 ]
